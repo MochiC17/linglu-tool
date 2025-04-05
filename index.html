@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>灵鹿 · 能量公式计算器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+    input, button { padding: 8px; margin: 6px 0; width: 100%; font-size: 16px; }
+    .result { background: #f4f4f4; padding: 12px; border-radius: 8px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <h2>灵鹿 · 能量公式计算器</h2>
+  <input id="colorInput" placeholder="输入颜色，例如：金 白" />
+  <input id="numberInput" placeholder="输入数字组合，例如：512" />
+  <button onclick="computeEnergy()">计算</button>
+
+  <div id="result" class="result" style="display:none;"></div>
+
+  <script>
+    const colorWeights = {
+      '银': 1.6, '金': 1.5, '蓝': 1.4, '橙': 1.3, '绿': 1.2, '白': 1.0,
+      '透明': 0.8, '灰': 0.6, '紫': 0.5, '粉': -0.5, '红': -1.0, '黑': -1.5,
+    };
+    const numberWeights = {
+      0: 0.0, 1: 1.5, 2: 1.2, 3: 1.1, 4: 1.0, 5: 1.5, 6: 1.0, 7: 1.3, 8: -1.2, 9: -1.5,
+    };
+
+    function computeEnergy() {
+      const colors = document.getElementById('colorInput').value.trim().split(/\\s+/);
+      const digits = document.getElementById('numberInput').value.trim().split('').map(d => parseInt(d)).filter(d => !isNaN(d));
+
+      if (colors.length === 0 || digits.length === 0) return;
+
+      const base = colors.map(c => colorWeights[c] || 0).reduce((a, b) => a + b, 0) / colors.length;
+      const parts = digits.map(n => Math.round(base * (numberWeights[n] || 0) * 100));
+      const average = parts.length > 0 ? Math.round(parts.reduce((a, b) => a + b, 0) / parts.length) : 0;
+
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('result').innerHTML =
+        `<p><strong>颜色平均基底值：</strong> ${base.toFixed(2)}</p>` +
+        `<p><strong>每位计算值：</strong> ${parts.join(' , ')}</p>` +
+        `<p><strong>综合能量值 E：</strong> ${average}</p>`;
+    }
+  </script>
+</body>
+</html>
